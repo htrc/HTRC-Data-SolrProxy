@@ -39,8 +39,8 @@ import org.apache.log4j.Logger;
 public class CommonQueryHandler {
 
 	// String BlackLight_IP = "192.168.1.12";
-	private static final Logger logger = Logger.getLogger(CommonQueryHandler.class.getName());
-	// this method is called if TEXT_PlAIN is requested
+	private static final Logger logger = Logger
+			.getLogger(CommonQueryHandler.class.getName());
 
 	@GET
 	@Produces(MediaType.TEXT_XML)
@@ -51,77 +51,64 @@ public class CommonQueryHandler {
 		System.out.println("==============================");
 		System.out.println(query_string);
 		final URI uri = ui.getRequestUri();
+
 		System.out.println("------------------------------");
 		System.out.println(ui.getRequestUri().toString());
 		System.out.println("uri: " + uri.toString());
 		// log file
-		
-		/*if (!ParamDefinition.logfile.exists()) {
-			ParamDefinition.logfile.createNewFile();
-			System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	"
-					+ "query_string	" + "status");
-			RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-					"\n" + "original_IP	" + "proxy_IP	" + "time	"
-							+ "query_string	" + "status");
-		}*/
-		if (!ParamDefinition.logfile.exists()) {
-			ParamDefinition.logfile.createNewFile();
-			/*System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	"
-					+ "query_string	" + "status");*/
-			/*RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-					"\n" + "original_IP	" + "proxy_IP	" + "time	"
-							+ "query_string	" + "status");*/
-			logger.debug("\n" + "original_IP	" + "proxy_IP	" + "time	"
-							+ "query_string	" + "status");
-		}
-		
-		
 
 		/*
-		 * if (!uri.toString().startsWith(ParamDefinition.Proxy_Server_EPR +
-		 * "/solr/select/")) {
-		 * 
-		 * Date today = new Date(); String log_content = "\n"+
-		 * hsr.getHeader("x-forwarded-for") +"	"+ hsr.getRemoteAddr() + "	" +
-		 * today.toString() + "	"+ uri+"	"+"blocked";
-		 * System.out.println(log_content);
-		 * RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-		 * log_content); throw new
-		 * IOException("Modification is not allowed!!!"); }
+		 * if (!ParamDefinition.logfile.exists()) {
+		 * ParamDefinition.logfile.createNewFile(); System.out.println("\n" +
+		 * "original_IP	" + "proxy_IP	" + "time	" + "query_string	" + "status");
+		 * RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), "\n"
+		 * + "original_IP	" + "proxy_IP	" + "time	" + "query_string	" +
+		 * "status"); }
 		 */
-		/*if (!uri.toString().startsWith(
-				ParamDefinition.Proxy_Server_EPR)) {
+		if (!ParamDefinition.logfile.exists()) {
+			ParamDefinition.logfile.createNewFile();
+			/*
+			 * System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	"
+			 * + "query_string	" + "status");
+			 */
+			/*
+			 * RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			 * "\n" + "original_IP	" + "proxy_IP	" + "time	" + "query_string	" +
+			 * "status");
+			 */
+			logger.debug("\n" + "original_IP	" + "proxy_IP	" + "time	"
+					+ "query_string	" + "status");
+		}
+
+		if (!uri.toString().split("\\?")[0].endsWith("/select/")
+				&& !uri.toString().split("\\?")[0].endsWith("/select")) {
 
 			Date today = new Date();
 			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
 					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
 					+ "	" + "blocked";
-			System.out.println(log_content);
-			RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-					log_content);
-			throw new IOException("Incorrect access point!!!");
-		}*/
-
-		if (!uri.toString().split("\\?")[0].endsWith("/select/")) {
-
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "blocked";
-			//System.out.println(log_content);
-			/*RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-					log_content);*/
+			// System.out.println(log_content);
+			/*
+			 * RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			 * log_content);
+			 */
 			logger.debug(log_content);
 			throw new IOException("Modification is not allowed!!!");
 		}
 
 		System.out.println("rawquery: " + uri.getRawQuery());
 
-		/*String solr_endpoint = (uri.toString().replace(
-				ParamDefinition.Proxy_Server_EPR,
-				ParamDefinition.Actual_Solr_EPR));*/
+		/*
+		 * String solr_endpoint = (uri.toString().replace(
+		 * ParamDefinition.Proxy_Server_EPR, ParamDefinition.Actual_Solr_EPR));
+		 */
 
-		String solr_endpoint = ParamDefinition.Actual_Solr_EPR + "/solr/select/?" + uri.getRawQuery();
+		String solr_endpoint = ParamDefinition.Actual_Solr_EPR
+				+ "/solr/select/?" + uri.getRawQuery();
+
+		if (hsr.getParameter("qt") == null) {
+			solr_endpoint = solr_endpoint + "&qt=sharding"; // make qt=sharding as default query type
+		}
 
 		System.out.println("solr EPR: " + (solr_endpoint));
 		System.out.println("remote address" + hsr.getRemoteAddr());
@@ -137,10 +124,12 @@ public class CommonQueryHandler {
 			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
 					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
 					+ "	" + "failed";
-			//System.out.println(log_content);
-			/*RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
-					log_content);*/
-			
+			// System.out.println(log_content);
+			/*
+			 * RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			 * log_content);
+			 */
+
 			logger.debug(log_content);
 			throw new IOException(conn.getResponseMessage());
 		}
@@ -191,9 +180,11 @@ public class CommonQueryHandler {
 				String log_content = "\n" + hsr.getHeader("x-forwarded-for")
 						+ "	" + hsr.getRemoteAddr() + "	" + today.toString()
 						+ "	" + uri + "	" + "allowed";
-			//	System.out.println(log_content);
-				/*RandomAccess.writeLog(
-						ParamDefinition.logfile.getAbsolutePath(), log_content);*/
+				// System.out.println(log_content);
+				/*
+				 * RandomAccess.writeLog(
+				 * ParamDefinition.logfile.getAbsolutePath(), log_content);
+				 */
 				logger.debug(log_content);
 				// String text = builder.toString();
 
