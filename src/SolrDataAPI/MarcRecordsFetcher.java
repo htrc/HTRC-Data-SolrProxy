@@ -33,9 +33,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import util.utility;
+
 @Path("/MARC/")
 public class MarcRecordsFetcher {
-	private static final Logger logger = Logger.getLogger(MarcRecordsFetcher.class.getName());
+	private static final Logger logger = Logger
+			.getLogger(MarcRecordsFetcher.class.getName());
+
 	/**
 	 * @param args
 	 * @return
@@ -47,7 +51,7 @@ public class MarcRecordsFetcher {
 			@Context UriInfo ui, @Context final HttpServletRequest hsr) {
 
 		final URI uri = ui.getRequestUri();
-		
+
 		String[] volumeID_array = null;
 
 		if (volume_ids.contains("|")) {
@@ -63,24 +67,29 @@ public class MarcRecordsFetcher {
 
 		if (id_set.isEmpty()) {
 			Date today = new Date();
-			String log_content = "\n"+ hsr.getHeader("x-forwarded-for") +"	"+ hsr.getRemoteAddr() + "	" + today.toString() + "	"+ uri+"	"+"IdNotfound";
-			//System.out.println(log_content);		
-			//RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), log_content);		
+			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+					+ "	" + "IdNotfound";
+			// System.out.println(log_content);
+			// RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			// log_content);
 			logger.debug(log_content);
 			new Exception("IDs not found!!");
 		}
 
 		if (!ParamDefinition.logfile.exists()) {
 			try {
+				ParamDefinition.logfile.mkdirs();
 				ParamDefinition.logfile.createNewFile();
 				System.out.println("\n" + "original_IP	" + "proxy_IP	"
 						+ "time	" + "query_string	" + "status");
-				/*RandomAccess.writeLog(
-						ParamDefinition.logfile.getAbsolutePath(), "\n"
-								+ "original_IP	" + "proxy_IP	" + "time	"
-								+ "query_string	" + "status");*/
-				logger.debug("\n"
-						+ "original_IP	" + "proxy_IP	" + "time	"
+				/*
+				 * RandomAccess.writeLog(
+				 * ParamDefinition.logfile.getAbsolutePath(), "\n" +
+				 * "original_IP	" + "proxy_IP	" + "time	" + "query_string	" +
+				 * "status");
+				 */
+				logger.debug("\n" + "original_IP	" + "proxy_IP	" + "time	"
 						+ "query_string	" + "status");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -102,13 +111,14 @@ public class MarcRecordsFetcher {
 
 				while (iter.hasNext()) {
 					id = (String) iter.next();
-					
+
 					String prefix_seq[] = id.split("\\.", 2);
 
 					marc = (String) id2marc_map.get(id);
 
-					//zos.putNextEntry(new ZipEntry(pt.cleanId(id) + ".xml"));
-					zos.putNextEntry(new ZipEntry(prefix_seq[0]+"."+ pt.cleanId(prefix_seq[1]) + ".xml"));
+					// zos.putNextEntry(new ZipEntry(pt.cleanId(id) + ".xml"));
+					zos.putNextEntry(new ZipEntry(prefix_seq[0] + "."
+							+ pt.cleanId(prefix_seq[1]) + ".xml"));
 
 					zos.write(marc.getBytes());
 
@@ -124,11 +134,14 @@ public class MarcRecordsFetcher {
 			}
 
 		};
-		
+
 		Date today = new Date();
-		String log_content = "\n"+ hsr.getHeader("x-forwarded-for") +"	"+ hsr.getRemoteAddr() + "	" + today.toString() + "	"+ uri+"	"+"allowed";
-		//System.out.println(log_content);		
-		//RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), log_content);
+		String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+				+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+				+ "	" + "allowed";
+		// System.out.println(log_content);
+		// RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+		// log_content);
 		logger.debug(log_content);
 		return Response
 				.ok(output)
@@ -155,12 +168,23 @@ public class MarcRecordsFetcher {
 		for (int i = 0; i < volumeID_array.length; i++) {
 			System.out.println("===" + volumeID_array[i]);
 
+			volumeID_array[i] = utility.escape(volumeID_array[i]);
+
 			if (i == 0)
-				queryString = "id:" + volumeID_array[i];// maybe we need to escape ":" and "/" here for unclean IDs.
+				queryString = "id:" + volumeID_array[i];// maybe we need to
+														// escape ":" and "/"
+														// here for unclean IDs.
 
 			else {
 
-				queryString += " OR " + "id:" + volumeID_array[i];// maybe we need to escape ":" and "/" here for unclean IDs.
+				queryString += " OR " + "id:" + volumeID_array[i];// maybe we
+																	// need to
+																	// escape
+																	// ":" and
+																	// "/" here
+																	// for
+																	// unclean
+																	// IDs.
 
 			}
 		}
@@ -194,14 +218,5 @@ public class MarcRecordsFetcher {
 		}
 		return id2marc_map;
 
-	}
-private static String escape(String uncleanID) {
-		
-		if(uncleanID.contains(":"))
-		{
-			return uncleanID.replace(":", "\\:");
-		}
-		
-		return uncleanID;
 	}
 }

@@ -66,6 +66,7 @@ public class CommonQueryHandler {
 		 * "status"); }
 		 */
 		if (!ParamDefinition.logfile.exists()) {
+			ParamDefinition.logfile.mkdirs();
 			ParamDefinition.logfile.createNewFile();
 			/*
 			 * System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	"

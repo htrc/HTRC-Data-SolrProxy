@@ -43,24 +43,29 @@ import org.dom4j.Element;
 
 @Path("/TermVector/")
 public class TermVectorFilterV2 {
-	private static final Logger logger = Logger.getLogger(TermVectorFilterV2.class.getName());
+	private static final Logger logger = Logger
+			.getLogger(TermVectorFilterV2.class.getName());
+
 	@GET
 	@Produces(MediaType.TEXT_XML)
-	public String getTermVector(
-			@QueryParam(value = "prefix") String prefix,
+	public String getTermVector(@QueryParam(value = "prefix") String prefix,
 			@QueryParam(value = "offset") boolean offset,
 			@QueryParam(value = "ngram") boolean ngram,
 			@QueryParam(value = "stopwords") boolean stopwords,
 			@QueryParam(value = "volumeID") String volume_id,
-			@Context UriInfo ui, @Context final HttpServletRequest hsr) throws IOException {
-		
+			@Context UriInfo ui, @Context final HttpServletRequest hsr)
+			throws IOException {
+
 		final URI uri = ui.getRequestUri();
-		if(!ParamDefinition.logfile.exists())
-		{
-			ParamDefinition.logfile.createNewFile(); 
-			System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	" + "query_string	"+ "status");	
-			//RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), "\n" + "original_IP	" + "proxy_IP	" + "time	" + "query_string	"+"status");
-			logger.debug("\n" + "original_IP	" + "proxy_IP	" + "time	" + "query_string	"+"status");
+		if (!ParamDefinition.logfile.exists()) {
+			ParamDefinition.logfile.createNewFile();
+			System.out.println("\n" + "original_IP	" + "proxy_IP	" + "time	"
+					+ "query_string	" + "status");
+			// RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			// "\n" + "original_IP	" + "proxy_IP	" + "time	" +
+			// "query_string	"+"status");
+			logger.debug("\n" + "original_IP	" + "proxy_IP	" + "time	"
+					+ "query_string	" + "status");
 		}
 
 		/*
@@ -78,184 +83,225 @@ public class TermVectorFilterV2 {
 		 */
 
 		// String query = item;
-		//File directory = new File (".");
-		//System.out.println("canonical path: " + directory.getCanonicalPath());
+		// File directory = new File (".");
+		// System.out.println("canonical path: " +
+		// directory.getCanonicalPath());
 		List<String> stopping_list = new LinkedList<String>();
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("../conf/stopwords.txt"))));
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(new File("../conf/stopwords.txt"))));
 		String line = null;
-		while((line=br.readLine()) != null)
-		{
+		while ((line = br.readLine()) != null) {
 			stopping_list.add(line);
 		}
-		
+
 		br.close();
-		
+
 		System.out.println("volume_id: " + volume_id);
 		System.out.println("prefix: " + prefix);
 		System.out.println("offset: " + offset);
 		System.out.println("ngram: " + ngram);
-		
-		if(prefix == null)
-		{
+
+		if (prefix == null) {
 			Date today = new Date();
-			String log_content = "\n"+ hsr.getHeader("x-forwarded-for") +"	"+ hsr.getRemoteAddr() + "	" + today.toString() + "	"+ uri+"	"+"failed";
-			//System.out.println(log_content);		
-			//RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), log_content);
+			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+					+ "	" + "failed";
+			// System.out.println(log_content);
+			// RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+			// log_content);
 			logger.debug(log_content);
 			throw new IOException("the prefix must be specified!!!");
 		}
-		
-		if(prefix.equals("*"))
-		{
+
+		if (prefix.equals("*")) {
 			prefix = "";
 		}
-		
-		String result = getFreqOffset(volume_id, prefix, offset, ngram, stopwords, stopping_list);
+
+		String result = getFreqOffset(volume_id, prefix, offset, ngram,
+				stopwords, stopping_list);
 		Date today = new Date();
-		String log_content = "\n"+ hsr.getHeader("x-forwarded-for") +"	"+ hsr.getRemoteAddr() + "	" + today.toString() + "	"+ uri+"	"+"allowed";
-		//System.out.println(log_content);		
-		//RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(), log_content);
+		String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+				+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+				+ "	" + "allowed";
+		// System.out.println(log_content);
+		// RandomAccess.writeLog(ParamDefinition.logfile.getAbsolutePath(),
+		// log_content);
 		logger.debug(log_content);
 		return result;
 	}
 
 	public String getFreqOffset(String volID, String starting_letter,
-			boolean offset, boolean ngram, boolean stopwords,List<String> stopping_list) throws IOException {
+			boolean offset, boolean ngram, boolean stopwords,
+			List<String> stopping_list) throws IOException {
 
+		// logger.debug("getFreqOffset invoked");
+		// System.out.println("getFreqOffset invoked");
 		// String volID = getFreqOffset.getVolID();
 		// String starting_letter = getFreqOffset.getStarting_letter();
 
 		// ///////////////
 
-		//File index_file = new File(
-			//	"Z:/apache-solr-miua/example/solr/data/index"); // local test
+		// File index_file = new File(
+		// "Z:/apache-solr-miua/example/solr/data/index"); // local test
 		//
 		// File index_file = new
 		// File("/nfs/magnolia/home/user2/hathitrust/SolrWithTermVectorTest/SolrServiceV2/apache-solr-9992/example/solr/data/index");//
 		// for coffeetree
-		//File index_file = new
+		// File index_file = new
 		// File("/nfs/magnolia/home/user2/hathitrust/SolrWithTermVectorTest/SolrServiceNGDP/SOLRNGDPTest/example/solr/data/index");//
 		// for sandbox illinois
-		File index_file = new
-				 File(ParamDefinition.LocalIndexPath);
-
-		FSDirectory index_dir = FSDirectory.open(index_file);
-
-		IndexReader index_reader = IndexReader.open(index_dir);
-
-		Collection list = index_reader
-				.getFieldNames(IndexReader.FieldOption.INDEXED_WITH_TERMVECTOR);
-
-		Iterator iter = list.iterator();
-
-		while (iter.hasNext()) {
-			System.out.println(iter.next());
-		}
-
-		int doc_numbers = index_reader.maxDoc();
-
-		System.out.println(doc_numbers);
-
-		TermQuery termquery = new TermQuery(new Term("id", volID));
-		IndexSearcher index_searcher = new IndexSearcher(index_reader);
-
-		// TopScoreDocCollector collector = TopScoreDocCollector.create(1,
-		// false);
-		TopDocs hits = index_searcher.search(termquery, index_reader.maxDoc());
-
-		System.out.println(hits.totalHits);
-
-		ScoreDoc[] docs = hits.scoreDocs;
-
-		System.out.println(docs.length);
 		String return_string = null;
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream("../conf/shard_locations.txt")));
+		String index_path = null;
+		while ((index_path = br.readLine()) != null) {
+			long t0 = System.currentTimeMillis();
+			System.out.println(index_path);// /////////
+			File index_file = new File(index_path);
 
-		Document document = DocumentHelper.createDocument();
+			FSDirectory index_dir = FSDirectory.open(index_file);
 
-		Element rootelement = document.addElement("lst");
+			IndexReader index_reader = IndexReader.open(index_dir);
 
-		rootelement.addAttribute("name", "termVectors");
+			/*
+			 * Collection list = index_reader
+			 * .getFieldNames(IndexReader.FieldOption.INDEXED_WITH_TERMVECTOR);
+			 * 
+			 * Iterator iter = list.iterator();
+			 * 
+			 * while (iter.hasNext()) { System.out.println(iter.next()); }
+			 */
 
-		for (int i = 0; i < docs.length; i++) {
-			int doc_id = docs[i].doc;
+			/*
+			 * int doc_numbers = index_reader.maxDoc();
+			 * 
+			 * System.out.println(doc_numbers);
+			 */
 
-			TermPositionVector vector = (TermPositionVector) index_reader
-					.getTermFreqVector(doc_id, "ocr");
+			TermQuery termquery = new TermQuery(new Term("id", volID));
+			IndexSearcher index_searcher = new IndexSearcher(index_reader);
 
-			System.out.println("-------------" + "" + doc_id);
-			Element docid = rootelement.addElement("lst");
-			docid.addAttribute("name", "doc-" + doc_id);
+			// TopScoreDocCollector collector = TopScoreDocCollector.create(1,
+			// false);
+			// TopDocs hits = index_searcher.search(termquery,
+			// index_reader.maxDoc());
+			TopDocs hits = index_searcher.search(termquery, 1);
 
-			Element volumeid = docid.addElement("str");
-			volumeid.addAttribute("name", "uniqueKey");
-			volumeid.setText(volID);
-
-			Element ocr = docid.addElement("lst");
-
-			ocr.addAttribute("name", "ocr");
-
-			String[] terms = vector.getTerms();
-			int[] frequencies = vector.getTermFrequencies();
-
-			if (terms.length == frequencies.length) {
-				System.out.println(terms.length + " words!!!");
+			System.out.println(hits.totalHits);
+			if (hits.totalHits < 1) {
+				System.out.println("continue, " + index_path);
+				index_searcher.close();
+				index_reader.close();
+				long t1 = System.currentTimeMillis();
+				System.out.println("not here and takes " + (t1 - t0)
+						+ " milliseconds!!");
+				continue;
 			}
 
-			for (int j = 0; j < terms.length; j++) {
-				if (terms[j].startsWith(starting_letter)) {
-					
-					if(ngram==false && terms[j].contains("_")){continue;}
-					if(stopwords==false && stopping_list.contains(terms[j])){continue;}
-					
-					Element element_term = ocr.addElement("lst");
-					element_term.addAttribute("name", terms[j]);
-					Element element_freq = element_term.addElement("int");
-					element_freq.addAttribute("name", "tf");
-					element_freq.setText(frequencies[j] + "");
+			ScoreDoc[] docs = hits.scoreDocs;
 
-					return_string = terms[j] + "#" + frequencies[j] + "#"
-							+ vector.getOffsets(j);
+			System.out.println(docs.length);
 
-					if (offset == true) {
-						TermVectorOffsetInfo[] TermVectorOffsetInfo_array = vector
-								.getOffsets(j);
+			Document document = DocumentHelper.createDocument();
 
-						System.out.println(return_string);
-						Element offsets_element = element_term
-								.addElement("lst");
-						offsets_element.addAttribute("name", "offsets");
-						for (int k = 0; k < TermVectorOffsetInfo_array.length; k++) {
-							int startoffset = TermVectorOffsetInfo_array[k]
-									.getStartOffset();
-							int endoffset = TermVectorOffsetInfo_array[k]
-									.getEndOffset();
-							Element offset_element_start = offsets_element
-									.addElement("int");
-							offset_element_start.addAttribute("name", "start");
-							offset_element_start.setText(startoffset + "");
+			Element rootelement = document.addElement("lst");
 
-							Element offset_element_end = offsets_element
-									.addElement("int");
-							offset_element_end.addAttribute("name", "end");
-							offset_element_end.setText(endoffset + "");
+			rootelement.addAttribute("name", "termVectors");
 
+			for (int i = 0; i < docs.length; i++) {
+				int doc_id = docs[i].doc;
+
+				TermPositionVector vector = (TermPositionVector) index_reader
+						.getTermFreqVector(doc_id, "ocr");
+
+				System.out.println("-------------" + "" + doc_id);
+				Element docid = rootelement.addElement("lst");
+				docid.addAttribute("name", "doc-" + doc_id);
+
+				Element volumeid = docid.addElement("str");
+				volumeid.addAttribute("name", "uniqueKey");
+				volumeid.setText(volID);
+
+				Element ocr = docid.addElement("lst");
+
+				ocr.addAttribute("name", "ocr");
+
+				String[] terms = vector.getTerms();
+				int[] frequencies = vector.getTermFrequencies();
+
+				if (terms.length == frequencies.length) {
+					System.out.println(terms.length + " words!!!");
+				}
+
+				for (int j = 0; j < terms.length; j++) {
+					if (terms[j].startsWith(starting_letter)) {
+
+						if (ngram == false && terms[j].contains("_")) {
+							continue;
+						}
+						if (stopwords == false
+								&& stopping_list.contains(terms[j])) {
+							continue;
 						}
 
+						Element element_term = ocr.addElement("lst");
+						element_term.addAttribute("name", terms[j]);
+						Element element_freq = element_term.addElement("int");
+						element_freq.addAttribute("name", "tf");
+						element_freq.setText(frequencies[j] + "");
+
+						return_string = terms[j] + "#" + frequencies[j] + "#"
+								+ vector.getOffsets(j);
+
+						if (offset == true) {
+							TermVectorOffsetInfo[] TermVectorOffsetInfo_array = vector
+									.getOffsets(j);
+
+							System.out.println(return_string);
+							Element offsets_element = element_term
+									.addElement("lst");
+							offsets_element.addAttribute("name", "offsets");
+							for (int k = 0; k < TermVectorOffsetInfo_array.length; k++) {
+								int startoffset = TermVectorOffsetInfo_array[k]
+										.getStartOffset();
+								int endoffset = TermVectorOffsetInfo_array[k]
+										.getEndOffset();
+								Element offset_element_start = offsets_element
+										.addElement("int");
+								offset_element_start.addAttribute("name",
+										"start");
+								offset_element_start.setText(startoffset + "");
+
+								Element offset_element_end = offsets_element
+										.addElement("int");
+								offset_element_end.addAttribute("name", "end");
+								offset_element_end.setText(endoffset + "");
+
+							}
+
+						}
 					}
 				}
 			}
-		}
 
-		return_string = document.asXML();
-		
-		index_reader.close();
+			return_string = document.asXML();
+			index_searcher.close();
+			index_reader.close();
+			br.close();
+
+			long t1 = System.currentTimeMillis();
+			System.out.println("found here and takes " + (t1 - t0)
+					+ " milliseconds!!");
+
+			return return_string;
+		}
 
 		// System.out.println(return_string);
 
 		// GetFreqOffsetResponse response = new GetFreqOffsetResponse();
 		// response.set_return(return_string);
 
-		return return_string;
+		return "No volumes found!";
 
 		// ///////////////
 
