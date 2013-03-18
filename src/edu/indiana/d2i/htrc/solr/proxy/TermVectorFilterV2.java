@@ -65,8 +65,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-//@Path("/hello")
-
 @Path("/TermVector/")
 public class TermVectorFilterV2 {
 	private static final Logger logger = Logger
