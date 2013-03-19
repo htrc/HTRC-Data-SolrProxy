@@ -66,8 +66,12 @@ public class MarcRecordsFetcher {
 			.getLogger(MarcRecordsFetcher.class.getName());
 
 	/**
-	 * @param args
-	 * @return
+	 * accept user-provided volume IDs and return user a zip file with marc record as each zip entry
+	 * 
+	 * @param volume_ids user provided "|"-seperated volume IDs
+	 * @param ui UriInfo object got from Context in Jersey framework
+	 * @param hsr HttpServletRequest object got from Context in Jersey framework
+	 * @return Response object that steams zip file back to client via StreamingOutput object
 	 */
 	@GET
 	@Produces("application/x-zip-compressed")
@@ -115,6 +119,12 @@ public class MarcRecordsFetcher {
 						"attachment; filename = marcs.zip").build();
 	}
 
+	/**
+	 * based on provided volumeID_array to get a id to MARC string map
+	 * 
+	 * @param volumeID_array user provided volume ID array
+	 * @return a id to MARC string map
+	 */
 	private Map<String, String> queryByVolIDs(String[] volumeID_array) {
 
 		Map<String, String> id2marc_map = new HashMap<String, String>();

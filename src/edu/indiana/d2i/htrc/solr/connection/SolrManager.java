@@ -45,6 +45,12 @@ public class SolrManager {
 		return solrServer;
 	}
 
+	/**
+	 * Constructor
+	 * 
+	 * @param solrEPR endpoint of Solr head shard
+	 * @param coreName	name of Solr core
+	 */
 	public SolrManager(String solrEPR, String coreName){
 		
 		try {
@@ -54,6 +60,12 @@ public class SolrManager {
 		}
 	}
 	
+	/**
+	 * send query String to Solr and get response
+	 * 
+	 * @param queryStr query String that can be parsed by Solr Query Parser 
+	 * @return query response, a org.apache.solr.client.solrj.response.QueryResponse object
+	 */
 	public QueryResponse query(String queryStr){
 		
 		SolrQuery query = new SolrQuery();
@@ -71,6 +83,14 @@ public class SolrManager {
 		return query_response;
 	}
 
+	/**
+	 * get a map from the document list in query response, value of filed fieldAsKey as key and value of filedAsValue as value
+	 * 
+	 * @param response query response from Solr, a org.apache.solr.client.solrj.response.QueryResponse object 
+	 * @param fieldAsKey the value of fieldAsKey is a key in the returned map
+	 * @param fieldAsValue the value of fileAsValue is a value in the returned map
+	 * @return a Map object in which each key/value pair is extracted from a solr document in QueryResponse response.
+	 */
 	public static Map<String, String> getFieldsMap(QueryResponse response, String fieldAsKey,
 			String fieldAsValue) {
 		

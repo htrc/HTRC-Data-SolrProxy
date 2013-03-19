@@ -42,10 +42,16 @@ public class MarcRecordsFetcherStreamingOutput implements StreamingOutput{
 
 	Map<String, String> id2marc_map;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param id2marc_map a id-to-MARC string map
+	 */
 	public MarcRecordsFetcherStreamingOutput(Map<String, String> id2marc_map){
 		this.id2marc_map = id2marc_map;
 	}
 	
+	// put all key/value pairs in the id-to-marc string map into ZipOutputStream zos = new ZipOutputStream(arg0);
 	@Override
 	public void write(OutputStream arg0) throws IOException,
 			WebApplicationException {

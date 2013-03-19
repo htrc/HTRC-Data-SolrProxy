@@ -46,11 +46,17 @@ import edu.indiana.d2i.htrc.solr.proxy.MarcRecordsFetcher;
 public class CommonQueryStreamingOutput implements StreamingOutput{
 	HttpURLConnection conn; // important member. For getting InputStream from http Solr instance connection
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param conn For getting InputStream from http connection to Solr instance 
+	 */
 	public CommonQueryStreamingOutput(HttpURLConnection conn){
 		
 		this.conn = conn;
 	}
 	
+	// stream the input from http connection to solr to outputStream arg0
 	@Override
 	public void write(OutputStream arg0) throws IOException,
 			WebApplicationException {

@@ -45,12 +45,22 @@ public class ParamDefinition extends Application{
 	
 	ServletConfig servletConfig = null;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param servletConfig ServletConfig servletConfig from Context of Jersey framework.
+	 */
 	ParamDefinition(ServletConfig servletConfig){
 		this.servletConfig = servletConfig;
 	}
 	
 	private static ParamDefinitionContainer config = null; //this is a singleton
 		
+	/**
+	 * get a ParamDefinitionContainer object
+	 * 
+	 * @return a ParamDefinitionContainer object that contains all configurable init-params in web.xml
+	 */
 	public ParamDefinitionContainer getConfig() {
 		
 		System.out.println("servletConfig == null is " + (servletConfig == null));
@@ -105,6 +115,13 @@ public class ParamDefinition extends Application{
 															// MARC index;
 		Properties properties = null; //new Properties();
 		
+		
+		/**
+		 * get property value based on given property name
+		 * 
+		 * @param name property name
+		 * @return property name 
+		 */
 		public String getProperty(String name){
 		
 			return properties.getProperty(name);

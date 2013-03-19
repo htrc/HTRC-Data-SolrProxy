@@ -70,6 +70,16 @@ public class CommonQueryHandler {
 	private static final Logger logger = Logger
 			.getLogger(CommonQueryHandler.class.getName());
 
+	/**
+	 * get query string from client, forward it to real solr instance and stream the result 
+	 * returned from solr instance back to client. 
+	 * 
+	 * @param query_string recieved query string from client side.
+	 * @param ui UriInfo object got from Context in jersey framework.
+	 * @param hsr HttpServletRequest object got from Context in jersey framework.
+	 * @return a StreamingOutput object that streams content returned from solr instance back to client.
+	 * @throws IOException
+	 */
 	@GET
 	@Produces(MediaType.TEXT_XML)
 	public StreamingOutput getQueryString(

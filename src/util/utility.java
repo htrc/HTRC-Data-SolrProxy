@@ -39,6 +39,12 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class utility {
+	/**
+	 * escape ":" in volume ID to avoid violation of query parser syntax
+	 * 
+	 * @param uncleanID unclean volume ID
+	 * @return escaped unclean volume ID
+	 */
 	public static String escape(String uncleanID) { // escape ":" because the
 													// query
 		// follows pattern
@@ -54,6 +60,14 @@ public class utility {
 		return uncleanID;
 	}
 
+	
+	
+	/**
+	 * delete a file or directory
+	 * 
+	 * @param file a file or a directory
+	 * @throws IOException
+	 */
 	public static void delete(File file) throws IOException {
 
 		if (file.isDirectory()) {
@@ -90,6 +104,14 @@ public class utility {
 		}
 	}
 
+	/**
+	 * compress a directory recursively into a zip file
+	 * 
+	 * @param dir directory to compress
+	 * @param zipName_no_ext name of result zip file without ".zip" extension
+	 * @return file name of the result zip file with ".zip" extension
+	 * @throws FileNotFoundException
+	 */
 	public static String zipDir(File dir, String zipName_no_ext)
 			throws FileNotFoundException {
 		int BUFFER = 2048;
@@ -124,6 +146,14 @@ public class utility {
 		return outputname;
 	}
 
+	/**
+	 * uncompress a zip file
+	 * 
+	 * @param zipFile the file name of the zip file to uncompress
+	 * @return relative path of the uncompressed result
+	 * @throws ZipException
+	 * @throws IOException
+	 */
 	static public String unzip(String zipFile) throws ZipException, IOException {
 		// System.out.println(zipFile);
 		int BUFFER = 2048;
