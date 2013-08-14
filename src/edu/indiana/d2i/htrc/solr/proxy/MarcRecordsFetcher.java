@@ -56,6 +56,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 
 import util.utility;
 import edu.indiana.d2i.htrc.solr.connection.SolrManager;
+import edu.indiana.d2i.htrc.solr.output.ErrorStreamingOutput;
 import edu.indiana.d2i.htrc.solr.output.MarcRecordsFetcherStreamingOutput;
 
 @Path("/MARC/")
@@ -102,7 +103,11 @@ public class MarcRecordsFetcher {
 					+ "	" + "IdNotfound";
 
 			logger.info(log_content);
-			new Exception("IDs not found!!");
+			
+			return  Response
+					.ok(new ErrorStreamingOutput("IdNotfound"))
+					.header("content-disposition",
+							"attachment; filename = IdNotfound.zip").build();
 		}
 
 		StreamingOutput output = new MarcRecordsFetcherStreamingOutput(id2marc_map);
@@ -147,7 +152,7 @@ public class MarcRecordsFetcher {
 		
 		QueryResponse response = solrManager.query(queryString);
 	
-		id2marc_map = SolrManager.getFieldsMap(response, "id", "marc");
+		id2marc_map = SolrManager.getFieldsMap(response, "id", "fullrecord");
 
 		return id2marc_map;
 	}

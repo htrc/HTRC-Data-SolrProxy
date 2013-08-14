@@ -65,21 +65,29 @@ public class ParamDefinition extends Application{
 		
 		System.out.println("servletConfig == null is " + (servletConfig == null));
 		
-		System.out.println(servletConfig.getInitParameterNames());
+		@SuppressWarnings("unchecked")
+		Enumeration<String> initParamNames = servletConfig.getInitParameterNames();
 		
 		if(config == null){
 			config = new ParamDefinitionContainer();
 			
 			config.properties = new Properties();
 			
-			config.Actual_Solr_EPR = this.servletConfig.getInitParameter("solr.shards.head.epr");
+			while(initParamNames.hasMoreElements()){
+				String name = initParamNames.nextElement();
+				String value = this.servletConfig.getInitParameter(name);
+				
+				config.properties.put(name, value);
+			}
+			
+			/*config.Actual_Solr_EPR = this.servletConfig.getInitParameter("solr.shards.head.epr");
 			config.properties.put("solr.shards.head.epr", config.Actual_Solr_EPR);
 			
 			config.MARC_Solr_EPR = this.servletConfig.getInitParameter("solr.marc.epr");
 			config.properties.put("solr.marc.epr", config.MARC_Solr_EPR);
 			
 			config.MARC_core_name = this.servletConfig.getInitParameter("solr.marc.core.name");
-			config.properties.put("solr.marc.core.name", config.MARC_core_name);
+			config.properties.put("solr.marc.core.name", config.MARC_core_name);*/
 			
 			return config;
 			
