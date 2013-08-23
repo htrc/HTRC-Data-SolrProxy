@@ -81,6 +81,19 @@ public class MarcRecordsFetcher {
 			@Context UriInfo ui, @Context final HttpServletRequest hsr) {
 
 		final URI uri = ui.getRequestUri();
+		
+		if(volume_ids == null){
+			Date today = new Date();
+			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+					+ "	" + "wrongParams";
+			
+			logger.info(log_content);
+			return  Response
+					.ok(new ErrorStreamingOutput("wrongParams"))
+					.header("content-disposition",
+							"attachment; filename = wrongParams.zip").build();
+		}
 
 		String[] volumeID_array = null;
 
