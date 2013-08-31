@@ -94,6 +94,19 @@ public class MarcRecordsFetcher {
 					.header("content-disposition",
 							"attachment; filename = wrongParams.zip").build();
 		}
+		
+		if(volume_ids.trim().equals("")){
+			Date today = new Date();
+			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
+					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
+					+ "	" + "emptyID";
+			
+			logger.info(log_content);
+			return  Response
+					.ok(new ErrorStreamingOutput("emptyID"))
+					.header("content-disposition",
+							"attachment; filename = emptyID.zip").build();
+		}
 
 		String[] volumeID_array = null;
 
