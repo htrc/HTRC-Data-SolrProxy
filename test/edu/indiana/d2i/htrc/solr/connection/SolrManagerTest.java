@@ -41,11 +41,12 @@ public class SolrManagerTest {
 	SolrManager manager;
 	static QueryResponse response;
 	static SolrDocument doc;
-	static String id = "mdp.39015013745735";
+	static String id = "wu.89100062264";
 	
 	@Before
 	public void prepare(){
-		manager = new SolrManager("http://chinkapin.pti.indiana.edu:9994", "meta");
+		manager = new SolrManager("http://chinkapin.pti.indiana.edu:9445", "meta");
+
 	}
 	
 	@Test
@@ -63,9 +64,9 @@ public class SolrManagerTest {
 	@Test
 	public void testGetFieldsMap() {
 		
-		Map<String, String> id2marcMap = manager.getFieldsMap(response, "id", "marc");
+		Map<String, String> id2marcMap = manager.getFieldsMap(response, "id", "fullrecord");
 		
-		String marc = doc.getFieldValue("marc").toString();
+		String marc = doc.getFieldValue("fullrecord").toString();
 		
 		assertEquals(marc, id2marcMap.get(id));
 	}

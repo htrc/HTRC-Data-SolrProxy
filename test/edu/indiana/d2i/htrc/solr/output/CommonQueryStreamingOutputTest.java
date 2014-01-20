@@ -42,7 +42,9 @@ public class CommonQueryStreamingOutputTest {
 	@Test
 	public void testWrite() {
 		
-		String endpoint = "http://chinkapin.pti.indiana.edu:9994/solr/meta/select/?q=id:mdp.39015013745735&start=0&rows=0";
+		// use either one below
+		String endpoint = "http://chinkapin.pti.indiana.edu:9994/solr/ocr/select/?q=id:mdp.39015013745735&start=0&rows=0";
+		//String endpoint = "http://chinkapin.pti.indiana.edu:9994/solr/meta/select/?q=id:mdp.39015013745735&start=0&rows=0";
 		URL url = null;
 		
 		try {
