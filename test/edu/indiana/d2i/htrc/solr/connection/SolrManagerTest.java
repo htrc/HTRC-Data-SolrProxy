@@ -46,7 +46,10 @@ public class SolrManagerTest {
 	@Before
 	public void prepare(){
 		manager = new SolrManager("http://chinkapin.pti.indiana.edu:9445", "meta");
-
+		
+		String queryStr = "id:"+id;
+		
+		response = manager.query(queryStr);
 	}
 	
 	@Test
@@ -54,7 +57,7 @@ public class SolrManagerTest {
 		
 		String queryStr = "id:"+id;
 		
-		response = manager.query(queryStr);
+		//response = manager.query(queryStr);
 		
 		doc = response.getResults().get(0);
 		
