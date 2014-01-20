@@ -150,7 +150,7 @@
         </javac>
     </target>
     <target description="builds all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target depends="build,CommonQueryStreamingOutputTest,MarcRecordsFetcherStreamingOutputTest,MarcRecordsFetcherTest,SolrManagerTest,utilityTest,UtilTest" name="test" description="runs all unit tests"/>
+    <target depends="build,CommonQueryStreamingOutputTest,MarcRecordsFetcherStreamingOutputTest,SolrManagerTest,utilityTest" name="test" description="runs all unit tests"/>
     <target name="CommonQueryStreamingOutputTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr" failureproperty="tests.failed"> 
@@ -167,14 +167,7 @@
             <classpath refid="solr.classpath"/>
         </junit>
     </target>
-    <target name="MarcRecordsFetcherTest">
-        <mkdir dir="${junit.output.dir}"/>
-        <junit fork="yes" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <formatter type="xml"/>
-            <test name="edu.indiana.d2i.htrc.solr.proxy.MarcRecordsFetcherTest" todir="${junit.output.dir}"/>
-            <classpath refid="solr.classpath"/>
-        </junit>
-    </target>
+   
     <target name="SolrManagerTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr" failureproperty="tests.failed">
@@ -199,14 +192,7 @@
             <classpath refid="solr.classpath"/>
         </junit>
     </target>
-    <target name="UtilTest">
-        <mkdir dir="${junit.output.dir}"/>
-        <junit fork="yes" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <formatter type="xml"/>
-            <test name="edu.indiana.d2i.htrc.solr.proxy.UtilTest" todir="${junit.output.dir}"/>
-            <classpath refid="solr.classpath"/>
-        </junit>
-    </target>
+  
     <target name="junitreport">
         <junitreport todir="${junit.output.dir}">
             <fileset dir="${junit.output.dir}">
