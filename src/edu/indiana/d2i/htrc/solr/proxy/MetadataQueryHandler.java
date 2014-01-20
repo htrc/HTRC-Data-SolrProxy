@@ -32,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
@@ -44,6 +45,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -71,12 +73,18 @@ public class MetadataQueryHandler {
 	 * @throws IOException
 	 */
 	@GET
-	@Produces(MediaType.TEXT_XML)
-	public StreamingOutput getMetadataQueryResult(
+	//@Produces(MediaType.TEXT_XML)
+	public Response getMetadataQueryResult(
 			/*@QueryParam("q") String query_string,*/
 			@Context UriInfo ui, @Context final HttpServletRequest hsr){
 		
 		final URI uri = ui.getRequestUri();
+	/*	List<String> solrQueryResponseWriters = ui.getQueryParameters().get("wt");
+		
+		
+		if(solrQueryResponseWriters!=null && solrQueryResponseWriters.size() > 0){
+			String responseWriter = solrQueryResponseWriters.get(0);
+		}*/
 		
 		/*
 		 * 1. get the uriBuilder of the request URI
@@ -112,7 +120,9 @@ public class MetadataQueryHandler {
 			logger.info(log_content);
 			e.printStackTrace();
 			
-			return new ErrorStreamingOutput("Malformed REST CALL!!");
+			return  Response
+					.ok(new ErrorStreamingOutput("Malformed REST CALL!!")).type(MediaType.TEXT_XML).build();
+			//return new ErrorStreamingOutput("Malformed REST CALL!!");
 		}
 		
 		HttpURLConnection conn = null;
@@ -123,8 +133,11 @@ public class MetadataQueryHandler {
 			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
 					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
 					+ "	" + "failed";
+			logger.info(log_content);
 			e.printStackTrace();
-			return new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL);
+			return  Response
+					.ok(new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL)).type(MediaType.TEXT_XML).build();
+			//return new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL);
 		}
 
 		try {
@@ -138,8 +151,9 @@ public class MetadataQueryHandler {
 						+ "	" + "failed";
 				
 				logger.info(log_content);
-				
-				return new ErrorStreamingOutput("RESPONSE CODE: " + responseCode);
+				return  Response
+						.ok(new ErrorStreamingOutput("RESPONSE CODE: " + responseCode)).type(MediaType.TEXT_XML).build();
+				//return new ErrorStreamingOutput("RESPONSE CODE: " + responseCode);
 			//	throw new IOException(conn.getResponseMessage());
 			}
 		} catch (IOException e) {
@@ -151,11 +165,13 @@ public class MetadataQueryHandler {
 					+ "	" + "failed";
 			
 			logger.info(log_content);
-			
-			return new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!");
+			return  Response
+					.ok(new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!")).type(MediaType.TEXT_XML).build();
+			//return new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!");
 		}
 		
 		StreamingOutput returnStream = new CommonQueryStreamingOutput(conn);
+		String contentType = conn.getContentType();
 		
 		Date today = new Date();
 
@@ -164,64 +180,9 @@ public class MetadataQueryHandler {
 				+ "	" + uri + "	" + "allowed";
 		
 		logger.info(log_content);
-		return returnStream;
 		
-		/*MultivaluedMap<String, String> queryParams = ui.getQueryParameters(); 
-		
-		Set<String> keys = queryParams.keySet();
-		
-		for(String key : keys){
-			
-			System.out.println("==:: " + key );
-			
-			System.out.println(queryParams.get(key));
-		}
-		
-		System.out.println("query_string: " + query_string);
-		System.out.println("uri: " + uri);*/
-		
-		/*if (!uri.toString().split("\\?")[0].endsWith("/select/")
-				&& !uri.toString().split("\\?")[0].endsWith("/select")) {
-
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "blocked";
-			
-			logger.info(log_content);
-			throw new IOException("Modification is not allowed!!!");
-		}
-
-		ParamDefinition ParamDef = new ParamDefinition(servletConfig);
-		String solr_endpoint = ParamDef.getConfig().getProperty("solr.shards.head.epr")
-				+ "/solr/select/?" + uri.getRawQuery();
-
-		if (hsr.getParameter("qt") == null) {
-			solr_endpoint = solr_endpoint + "&qt=sharding"; // make qt=sharding as default query type
-		}
-
-		URL url = new URL(solr_endpoint);
-		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-		if (conn.getResponseCode() != 200) {
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "failed";
-			
-			logger.info(log_content);
-			throw new IOException(conn.getResponseMessage());
-		}
-		
-		StreamingOutput returnStream = new CommonQueryStreamingOutput(conn);
-		
-		Date today = new Date();
-
-		String log_content = "\n" + hsr.getHeader("x-forwarded-for")
-				+ "	" + hsr.getRemoteAddr() + "	" + today.toString()
-				+ "	" + uri + "	" + "allowed";
-		
-		logger.info(log_content);
-		return returnStream;*/
+		return  Response
+				.ok(returnStream).type(contentType).build();
+		//return returnStream;
 	}
 }

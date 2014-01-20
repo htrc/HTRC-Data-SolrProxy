@@ -41,6 +41,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -69,8 +70,8 @@ public class OcrQueryHandler {
 	 * @throws IOException
 	 */
 	@GET
-	@Produces(MediaType.TEXT_XML)
-	public StreamingOutput getOcrQueryResult(
+	//@Produces(MediaType.TEXT_XML)
+	public Response getOcrQueryResult(
 			@Context UriInfo ui, @Context final HttpServletRequest hsr)
 			{
 		
@@ -115,7 +116,9 @@ public class OcrQueryHandler {
 			logger.info(log_content);
 			e.printStackTrace();
 			
-			return new ErrorStreamingOutput("Malformed REST CALL!!");
+			return Response
+					.ok(new ErrorStreamingOutput("Malformed REST CALL!!")).type(MediaType.TEXT_XML).build();
+			//return new ErrorStreamingOutput("Malformed REST CALL!!");
 		}
 		
 		HttpURLConnection conn = null;
@@ -127,7 +130,9 @@ public class OcrQueryHandler {
 					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
 					+ "	" + "failed";
 			e.printStackTrace();
-			return new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL);
+			return Response
+					.ok(new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL)).type(MediaType.TEXT_XML).build();
+			//return new ErrorStreamingOutput("COULD NOT OPEN COLLECTION to " + newURL);
 		}
 
 		try {
@@ -140,7 +145,9 @@ public class OcrQueryHandler {
 				
 				logger.info(log_content);
 				
-				return new ErrorStreamingOutput("RESPONSE CODE: " + responseCode);
+				return Response
+						.ok(new ErrorStreamingOutput("RESPONSE CODE: " + responseCode)).type(MediaType.TEXT_XML).build();
+			//	return new ErrorStreamingOutput("RESPONSE CODE: " + responseCode);
 			//	throw new IOException(conn.getResponseMessage());
 			}
 		} catch (IOException e) {
@@ -153,10 +160,15 @@ public class OcrQueryHandler {
 			
 			logger.info(log_content);
 			
-			return new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!");
+			return Response
+					.ok(new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!")).type(MediaType.TEXT_XML).build();
+			
+			//return new ErrorStreamingOutput("ERROR OCCURED CONNECTING TO SOLR  SERVER!!");
 		}
 		
 		StreamingOutput returnStream = new CommonQueryStreamingOutput(conn);
+		// get content type from solr response and set content type in response with this value
+		String contentType = conn.getContentType();
 		
 		Date today = new Date();
 
@@ -166,50 +178,8 @@ public class OcrQueryHandler {
 		
 		logger.info(log_content);
 		
-		return returnStream;		
-/*
-		if (!uri.toString().split("\\?")[0].endsWith("/select/")
-				&& !uri.toString().split("\\?")[0].endsWith("/select")) {
-
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "blocked";
-			
-			logger.info(log_content);
-			throw new IOException("Modification is not allowed!!!");
-		}
-
-		ParamDefinition ParamDef = new ParamDefinition(servletConfig);
-		String solr_endpoint = ParamDef.getConfig().getProperty("solr.shards.head.epr")
-				+ "/solr/select/?" + uri.getRawQuery();
-
-		if (hsr.getParameter("qt") == null) {
-			solr_endpoint = solr_endpoint + "&qt=sharding"; // make qt=sharding as default query type
-		}
-
-		URL url = new URL(solr_endpoint);
-		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-		if (conn.getResponseCode() != 200) {
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "failed";
-			
-			logger.info(log_content);
-			throw new IOException(conn.getResponseMessage());
-		}
-		
-		StreamingOutput returnStream = new CommonQueryStreamingOutput(conn);
-		
-		Date today = new Date();
-
-		String log_content = "\n" + hsr.getHeader("x-forwarded-for")
-				+ "	" + hsr.getRemoteAddr() + "	" + today.toString()
-				+ "	" + uri + "	" + "allowed";
-		
-		logger.info(log_content);
-		return returnStream;*/
+		return Response
+				.ok(returnStream).type(contentType).build();
+	//	return returnStream;		
 	}
 }
