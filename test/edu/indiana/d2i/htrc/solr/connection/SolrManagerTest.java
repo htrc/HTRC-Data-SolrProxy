@@ -50,6 +50,7 @@ public class SolrManagerTest {
 		String queryStr = "id:"+id;
 		
 		response = manager.query(queryStr);
+		doc = response.getResults().get(0);
 	}
 	
 	@Test
@@ -59,7 +60,7 @@ public class SolrManagerTest {
 		
 		//response = manager.query(queryStr);
 		
-		doc = response.getResults().get(0);
+		//doc = response.getResults().get(0);
 		
 		assertEquals(id, doc.getFieldValue("id"));
 	}
