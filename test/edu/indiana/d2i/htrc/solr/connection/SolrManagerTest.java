@@ -45,7 +45,7 @@ public class SolrManagerTest {
 	
 	@Before
 	public void prepare(){
-		manager = new SolrManager("http://chinkapin.pti.indiana.edu:9444", "marc");
+		manager = new SolrManager("http://chinkapin.pti.indiana.edu:9994", "meta");
 	}
 	
 	@Test

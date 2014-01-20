@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="solr">
     <property environment="env"/>
-    <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
+    <property name="build.dir" value="${basedir}/build"/>
+    <property name="dist.dir" value="${basedir}/dist"/>
+    <property name="junit.output.dir" value="junit"/>
     <path id="Web App Libraries.libraryclasspath">
         <pathelement location="WebContent/WEB-INF/lib/CleanPairTree_fat.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/Ray-Tracer-API-B534-V1.jar"/>
@@ -103,30 +105,33 @@
     </path>
     <path id="EAR Libraries.libraryclasspath"/>
     <path id="solr.classpath">
-        <pathelement location="build/classes"/>
+        <pathelement location="${build.dir}/classes"/>
         <path refid="Web App Libraries.libraryclasspath"/>
         <path refid="EAR Libraries.libraryclasspath"/>
     </path>
     <target name="init">
-        <mkdir dir="build/classes"/>
-        <copy includeemptydirs="false" todir="build/classes">
+        <mkdir dir="${build.dir}/classes"/>
+        <copy includeemptydirs="false" todir="${build.dir}/classes">
             <fileset dir="src">
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
-        <copy includeemptydirs="false" todir="build/classes">
+        <copy includeemptydirs="false" todir="${build.dir}/classes">
             <fileset dir="test">
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
     </target>
-    <target name="clean">
-        <delete dir="build/classes"/>
+    <target name="clean" description="removes all build artifacts">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${junit.output.dir}"/>
     </target>
     <target depends="clean" name="cleanall"/>
-    <target depends="build-subprojects,build-project" name="build">
-    	<war destfile="solr.war" webxml="WebContent/WEB-INF/web.xml" update="true">
-    		<classes dir="build/classes" />
+    <target depends="build-subprojects,build-project" name="build" description="builds the entire project"/>
+    <target depends="build" name="dist" description="creates the distribution package">
+    	<war destfile="${dist.dir}/solr.war" webxml="WebContent/WEB-INF/web.xml" update="true">
+    		<classes dir="${build.dir}/classes" />
     			<fileset dir="WebContent">
     				<exclude name="WEB-INF/web.xml" />
     			</fileset>
@@ -135,13 +140,14 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" includeantruntime="false" source="${source}" target="${target}">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build.dir}/classes" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
             <src path="test"/>
             <classpath refid="solr.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="builds all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target depends="build,CommonQueryStreamingOutputTest,MarcRecordsFetcherStreamingOutputTest,MarcRecordsFetcherTest,SolrManagerTest,utilityTest,UtilTest" name="test" description="runs all unit tests"/>
     <target name="CommonQueryStreamingOutputTest">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
