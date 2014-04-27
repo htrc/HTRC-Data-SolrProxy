@@ -25,6 +25,8 @@
 */
 package edu.indiana.d2i.htrc.solr.output;
 
+import gov.loc.repository.pairtree.Pairtree;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -35,8 +37,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
-
-import main.java.gov.loc.repository.pairtree.Pairtree;
 
 public class MarcRecordsFetcherStreamingOutput implements StreamingOutput{
 

@@ -49,8 +49,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
-import main.java.gov.loc.repository.pairtree.Pairtree;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
@@ -161,22 +159,22 @@ public class MarcRecordsFetcher {
 		Map<String, String> id2marc_map = new HashMap<String, String>();
 					
 		ParamDefinition ParamDef = new ParamDefinition(servletConfig);
-		SolrManager solrManager = new SolrManager(ParamDef.getConfig().getProperty("solr.marc.epr"), ParamDef.getConfig().getProperty("solr.marc.core.name"));
+		SolrManager solrManager = new SolrManager(ParamDef.getConfig().getProperty("solr.meta.host"), ParamDef.getConfig().getProperty("solr.meta.port"),ParamDef.getConfig().getProperty("solr.meta.core"));
 		
-		String queryString = "";
+		StringBuilder queryStringBuilder = new StringBuilder();
 		for (int i = 0; i < volumeID_array.length; i++) {
 
 			volumeID_array[i] = utility.escape(volumeID_array[i]);
 
 			if (i == 0)
-				queryString = "id:" + volumeID_array[i];
+				queryStringBuilder.append("id:").append(volumeID_array[i]);
 
 			else {
-				queryString += " OR " + "id:" + volumeID_array[i];
+				queryStringBuilder.append(" OR ").append("id:").append(volumeID_array[i]);
 			}
 		}
 		
-		QueryResponse response = solrManager.query(queryString);
+		QueryResponse response = solrManager.query(queryStringBuilder.toString());
 	
 		id2marc_map = SolrManager.getFieldsMap(response, "id", "fullrecord");
 

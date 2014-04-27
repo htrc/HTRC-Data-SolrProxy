@@ -103,7 +103,9 @@ public class MetadataQueryHandler {
 		uriBuilder.host(ParamDef.getConfig()
 				.getProperty("solr.meta.host"))
 				.port(Integer.valueOf(ParamDef.getConfig()
-						.getProperty("solr.meta.port")));
+						.getProperty("solr.meta.port")))
+						.replacePath("solr/" + ParamDef.getConfig()
+								.getProperty("solr.meta.core")+"/select");
 		
 		URI newURI = uriBuilder.build();
 		System.out.println("uriBuilder.build(): " + newURI);

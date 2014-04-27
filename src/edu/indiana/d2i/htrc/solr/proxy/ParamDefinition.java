@@ -39,8 +39,6 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
-import com.sun.jersey.spi.container.servlet.WebConfig;
-
 public class ParamDefinition extends Application{
 	
 	ServletConfig servletConfig = null;

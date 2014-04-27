@@ -8,7 +8,8 @@
     <property name="dist.dir" value="${basedir}/dist"/>
     <property name="junit.output.dir" value="junit"/>
     <path id="Web App Libraries.libraryclasspath">
-        <pathelement location="WebContent/WEB-INF/lib/CleanPairTree_fat.jar"/>
+    	<fileset dir="WebContent/WEB-INF/lib" includes="**/*.jar"/>
+        <!--<pathelement location="WebContent/WEB-INF/lib/CleanPairTree_fat.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/Ray-Tracer-API-B534-V1.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/XmlSchema-1.4.2.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/activation-1.1.jar"/>
@@ -101,7 +102,7 @@
         <pathelement location="WebContent/WEB-INF/lib/xercesImpl-2.8.1.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/xml-apis-1.3.04.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/xml-resolver-1.2.jar"/>
-        <pathelement location="WebContent/WEB-INF/lib/xmlbeans-2.3.0.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/xmlbeans-2.3.0.jar"/> -->
     </path>
     <path id="EAR Libraries.libraryclasspath"/>
     <path id="solr.classpath">

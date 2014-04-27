@@ -31,17 +31,19 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 public class SolrManager {
 
-	private CommonsHttpSolrServer solrServer = null;
+	private SolrServer solrServer = null;
 	
-	public CommonsHttpSolrServer getSolrServer() {
+	public SolrServer getSolrServer() {
 		return solrServer;
 	}
 
@@ -51,13 +53,9 @@ public class SolrManager {
 	 * @param solrEPR endpoint of Solr head shard
 	 * @param coreName	name of Solr core
 	 */
-	public SolrManager(String solrEPR, String coreName){
+	public SolrManager(String solrhost, String port, String coreName){
 		
-		try {
-			solrServer = new CommonsHttpSolrServer(solrEPR+ "/solr/" + coreName);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		solrServer = new HttpSolrServer("http://" + solrhost+":" + port + "/solr/" + coreName);
 	}
 	
 	/**

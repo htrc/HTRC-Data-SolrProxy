@@ -19,33 +19,30 @@
 			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value> 
 			</init-param> -->
 		<init-param>
-			<param-name>solr.shards.head.epr</param-name>
-			<param-value>http://htrc1.pti.indiana.edu:9447</param-value> 
-		</init-param>
-		<init-param>
 			<param-name>solr.meta.host</param-name>
 			<param-value>chinkapin.pti.indiana.edu</param-value>
 		</init-param>
 		<init-param>
 			<param-name>solr.meta.port</param-name>
+			<param-value>9545</param-value>
+		</init-param>
+		<init-param>
+			<param-name>solr.meta.core</param-name>
+			<param-value>collection1</param-value>
+		</init-param>
+		<init-param>
+			<param-name>solr.ocr.host</param-name>
+			<param-value>htrc1.pti.indiana.edu,htrc2.pti.indiana.edu,htrc3.pti.indiana.edu,htrc4.pti.indiana.edu,htrc5.pti.indiana.edu,htrc6.pti.indiana.edu</param-value>
+		</init-param>
+		<init-param>
+			<param-name>solr.ocr.port</param-name>
 			<param-value>9445</param-value>
 		</init-param>
 		<init-param>
-			<param-name>solr.ocr.headshard.host</param-name>
-			<param-value>htrc1.pti.indiana.edu</param-value>
+			<param-name>solr.ocr.core</param-name>
+			<param-value>ocr</param-value>
 		</init-param>
-		<init-param>
-			<param-name>solr.ocr.headshard.port</param-name>
-			<param-value>9447</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.marc.epr</param-name>
-			<param-value>http://chinkapin.pti.indiana.edu:9445</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.marc.core.name</param-name>
-			<param-value></param-value>
-		</init-param>
+				
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>

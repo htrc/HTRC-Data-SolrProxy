@@ -84,23 +84,17 @@ public class OcrQueryHandler {
 	//	System.out.println(queryParamKeySet);
 		ParamDefinition ParamDef = new ParamDefinition(servletConfig);
 		
-		
-		
-		URI newURI = null;
-		if(queryParamKeySet.contains("qt")){
-			newURI = uriBuilder.host(ParamDef.getConfig()
-					.getProperty("solr.ocr.headshard.host"))
+		String[] hosts = ParamDef.getConfig().getProperty("solr.ocr.host").split(",");
+		int hostNum = hosts.length;
+		String host = hosts[(int) (Math.random() * hostNum)];
+		System.out.println("dispatch to " + host);
+		URI newURI = uriBuilder.host(host)
 					.port(Integer.valueOf(ParamDef.getConfig()
-							.getProperty("solr.ocr.headshard.port")))
-					.replacePath("solr/select").build();
-		}else{
-			newURI = uriBuilder.host(ParamDef.getConfig()
-					.getProperty("solr.ocr.headshard.host"))
-					.port(Integer.valueOf(ParamDef.getConfig()
-							.getProperty("solr.ocr.headshard.port")))
-							.replacePath("solr/select")
-							.queryParam("qt", "sharding").build();  // add qt=sharding so that the distributed search will be used
-		}
+							.getProperty("solr.ocr.port")))
+							.replacePath("solr/" + ParamDef.getConfig()
+									.getProperty("solr.ocr.core")+"/select")
+							.build();  
+		
 		
 		System.out.println("new OCR uri: " + newURI);
 		
