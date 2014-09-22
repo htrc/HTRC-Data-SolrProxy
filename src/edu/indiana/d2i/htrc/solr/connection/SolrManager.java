@@ -25,7 +25,6 @@
 */
 package edu.indiana.d2i.htrc.solr.connection;
 
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,7 +53,6 @@ public class SolrManager {
 	 * @param coreName	name of Solr core
 	 */
 	public SolrManager(String solrhost, String port, String coreName){
-		
 		solrServer = new HttpSolrServer("http://" + solrhost+":" + port + "/solr/" + coreName);
 	}
 	
@@ -91,7 +89,6 @@ public class SolrManager {
 	 */
 	public static Map<String, String> getFieldsMap(QueryResponse response, String fieldAsKey,
 			String fieldAsValue) {
-		
 		HashMap<String, String> id2marc_map = new HashMap<String, String>();
 		
 		SolrDocumentList solr_doc_list = response.getResults();

@@ -23,19 +23,13 @@
 #
 # -----------------------------------------------------------------
 # 
-*/
+ */
 package edu.indiana.d2i.htrc.solr.proxy;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +37,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -59,125 +52,99 @@ import edu.indiana.d2i.htrc.solr.output.MarcRecordsFetcherStreamingOutput;
 
 @Path("/MARC/")
 public class MarcRecordsFetcher {
-	@Context ServletConfig servletConfig;
-	
-	private static final Logger logger = Logger
-			.getLogger(MarcRecordsFetcher.class.getName());
+	@Context
+	ServletConfig servletConfig;
+
+	private static final Logger logger = Logger.getLogger(MarcRecordsFetcher.class.getName());
 
 	/**
-	 * accept user-provided volume IDs and return user a zip file with marc record as each zip entry
+	 * accept user-provided volume IDs and return user a zip file with marc
+	 * record as each zip entry
 	 * 
-	 * @param volume_ids user provided "|"-seperated volume IDs
-	 * @param ui UriInfo object got from Context in Jersey framework
-	 * @param hsr HttpServletRequest object got from Context in Jersey framework
-	 * @return Response object that steams zip file back to client via StreamingOutput object
+	 * @param volume_ids
+	 *            user provided "|"-seperated volume IDs
+	 * @param ui
+	 *            UriInfo object got from Context in Jersey framework
+	 * @param hsr
+	 *            HttpServletRequest object got from Context in Jersey framework
+	 * @return Response object that steams zip file back to client via
+	 *         StreamingOutput object
 	 */
 	@GET
 	@Produces("application/x-zip-compressed")
-	public Response getMARC(
-			@QueryParam(value = "volumeIDs") String volume_ids,
-			@Context UriInfo ui, @Context final HttpServletRequest hsr) {
-
+	public Response getMARC(@QueryParam(value = "volumeIDs") String volumeIDs, @Context UriInfo ui, @Context final HttpServletRequest hsr) {
 		final URI uri = ui.getRequestUri();
-		
-		if(volume_ids == null){
+
+		if (volumeIDs == null) {
 			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "wrongParams";
-			
-			logger.info(log_content);
-			return  Response
-					.ok(new ErrorStreamingOutput("wrongParams"))
-					.header("content-disposition",
-							"attachment; filename = wrongParams.zip").build();
-		}
-		
-		if(volume_ids.trim().equals("")){
-			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "emptyID";
-			
-			logger.info(log_content);
-			return  Response
-					.ok(new ErrorStreamingOutput("emptyID"))
-					.header("content-disposition",
-							"attachment; filename = emptyID.zip").build();
+			String logContent = "\n" + hsr.getHeader("x-forwarded-for") + "	" + hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri + "	" + "wrongParams";
+
+			logger.info(logContent);
+			return Response.ok(new ErrorStreamingOutput("wrongParams")).header("content-disposition", "attachment; filename = wrongParams.zip").build();
 		}
 
-		String[] volumeID_array = null;
+		if (volumeIDs.trim().equals("")) {
+			Date today = new Date();
+			String logContent = "\n" + hsr.getHeader("x-forwarded-for") + "	" + hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri + "	" + "emptyID";
 
-		if (volume_ids.contains("|")) {
-			volumeID_array = volume_ids.split("\\|");
+			logger.info(logContent);
+			return Response.ok(new ErrorStreamingOutput("emptyID")).header("content-disposition", "attachment; filename = emptyID.zip").build();
+		}
+
+		String[] volumeIdArray = null;
+
+		if (volumeIDs.contains("|")) {
+			volumeIdArray = volumeIDs.split("\\|");
 		} else {
-			volumeID_array = new String[1];
-			volumeID_array[0] = volume_ids;
+			volumeIdArray = new String[1];
+			volumeIdArray[0] = volumeIDs;
 		}
 
-		final Map<String, String> id2marc_map = queryByVolIDs(volumeID_array);
+		final Map<String, String> id2marcMap = queryByVolIDs(volumeIdArray);
 
-		final Set<String> id_set = id2marc_map.keySet();
-
-		if (id_set.isEmpty()) {
-			
+		if (id2marcMap.isEmpty()) {
 			Date today = new Date();
-			String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-					+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-					+ "	" + "IdNotfound";
-
-			logger.info(log_content);
-			
-			return  Response
-					.ok(new ErrorStreamingOutput("IdNotfound"))
-					.header("content-disposition",
-							"attachment; filename = IdNotfound.zip").build();
+			String logContent = "\n" + hsr.getHeader("x-forwarded-for") + "	" + hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri + "	" + "IdNotfound";
+			logger.info(logContent);
+			// just return a empty zip file
+			return Response.ok(new MarcRecordsFetcherStreamingOutput(id2marcMap)).header("content-disposition", "attachment; filename = IdNotfound.zip").build();
 		}
 
-		StreamingOutput output = new MarcRecordsFetcherStreamingOutput(id2marc_map);
-				
+		StreamingOutput output = new MarcRecordsFetcherStreamingOutput(id2marcMap);
+
 		Date today = new Date();
-		String log_content = "\n" + hsr.getHeader("x-forwarded-for") + "	"
-				+ hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri
-				+ "	" + "allowed";
-		
-		logger.info(log_content);
-		return Response
-				.ok(output)
-				.header("content-disposition",
-						"attachment; filename = marcs.zip").build();
+		String logContent = "\n" + hsr.getHeader("x-forwarded-for") + "	" + hsr.getRemoteAddr() + "	" + today.toString() + "	" + uri + "	" + "allowed";
+
+		logger.info(logContent);
+		return Response.ok(output).header("content-disposition", "attachment; filename = marcs.zip").build();
 	}
 
 	/**
-	 * based on provided volumeID_array to get a id to MARC string map
+	 * based on provided volumeIdArray to get a id to MARC string map
 	 * 
-	 * @param volumeID_array user provided volume ID array
+	 * @param volumeIdArray
+	 *            user provided volume ID array
 	 * @return a id to MARC string map
 	 */
-	private Map<String, String> queryByVolIDs(String[] volumeID_array) {
+	private Map<String, String> queryByVolIDs(String[] volumeIdArray) {
+		Map<String, String> id2marcMap = new HashMap<String, String>();
 
-		Map<String, String> id2marc_map = new HashMap<String, String>();
-					
 		ParamDefinition ParamDef = new ParamDefinition(servletConfig);
-		SolrManager solrManager = new SolrManager(ParamDef.getConfig().getProperty("solr.meta.host"), ParamDef.getConfig().getProperty("solr.meta.port"),ParamDef.getConfig().getProperty("solr.meta.core"));
-		
+		SolrManager solrManager = new SolrManager(ParamDef.getConfig().getProperty("solr.meta.host"), ParamDef.getConfig().getProperty("solr.meta.port"), ParamDef.getConfig().getProperty(
+				"solr.meta.core"));
+
 		StringBuilder queryStringBuilder = new StringBuilder();
-		for (int i = 0; i < volumeID_array.length; i++) {
-
-			volumeID_array[i] = utility.escape(volumeID_array[i]);
-
-			if (i == 0)
-				queryStringBuilder.append("id:").append(volumeID_array[i]);
-
-			else {
-				queryStringBuilder.append(" OR ").append("id:").append(volumeID_array[i]);
+		for (int i = 0; i < volumeIdArray.length; i++) {
+			volumeIdArray[i] = utility.escape(volumeIdArray[i]);
+			if (i == 0) {
+				queryStringBuilder.append("id:").append(volumeIdArray[i]);
+			} else {
+				queryStringBuilder.append(" OR ").append("id:").append(volumeIdArray[i]);
 			}
 		}
-		
 		QueryResponse response = solrManager.query(queryStringBuilder.toString());
-	
-		id2marc_map = SolrManager.getFieldsMap(response, "id", "fullrecord");
+		id2marcMap = SolrManager.getFieldsMap(response, "id", "fullrecord");
 
-		return id2marc_map;
+		return id2marcMap;
 	}
 }
