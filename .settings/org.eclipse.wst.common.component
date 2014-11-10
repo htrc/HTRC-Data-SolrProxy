@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="HTRC-Data-SolrProxy">
+    <wb-module deploy-name="HTRC-SolrProxy">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
-        <property name="context-root" value="HTRC-Data-SolrProxy"/>
-        <property name="java-output-path" value="/HTRC-Data-SolrProxy/build/classes"/>
+        <property name="java-output-path" value="/HTRC-SolrProxy/build/classes"/>
+        <property name="context-root" value="HTRC-SolrProxy"/>
     </wb-module>
 </project-modules>

@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	id="WebApp_ID" version="2.5">
-	<display-name>SolrDataAPI</display-name>
-	<servlet>
-		<servlet-name>solr_servlet</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>edu.indiana.d2i.htrc.solr.proxy</param-value>
-		</init-param>
-		<init-param>
-			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-		</init-param>
-		<!-- <init-param> <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name> 
-			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value> 
-			</init-param> -->
-		<init-param>
-			<param-name>solr.meta.host</param-name>
-			<param-value>chinkapin.pti.indiana.edu</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.meta.port</param-name>
-			<param-value>9545</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.meta.core</param-name>
-			<param-value>collection1</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.ocr.host</param-name>
-			<param-value>htrc1.pti.indiana.edu,htrc2.pti.indiana.edu,htrc3.pti.indiana.edu,htrc4.pti.indiana.edu,htrc5.pti.indiana.edu,htrc6.pti.indiana.edu</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.ocr.port</param-name>
-			<param-value>9445</param-value>
-		</init-param>
-		<init-param>
-			<param-name>solr.ocr.core</param-name>
-			<param-value>ocr</param-value>
-		</init-param>
-				
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>solr_servlet</servlet-name>
-		<url-pattern>/*</url-pattern>
-	</servlet-mapping>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>SolrDataAPI</display-name>
+  <servlet>
+    <servlet-name>solr_servlet</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>edu.indiana.d2i.htrc.solr.proxy</param-value>
+    </init-param>
+    <init-param>
+      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+      <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.meta.host</param-name>
+      <param-value>chinkapin.pti.indiana.edu</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.meta.port</param-name>
+      <param-value>9545</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.meta.core</param-name>
+      <param-value>collection1</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.ocr.host</param-name>
+      <param-value>htrc1.pti.indiana.edu,htrc2.pti.indiana.edu,htrc3.pti.indiana.edu,htrc4.pti.indiana.edu,htrc5.pti.indiana.edu,htrc6.pti.indiana.edu</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.ocr.port</param-name>
+      <param-value>9445</param-value>
+    </init-param>
+    <init-param>
+      <param-name>solr.ocr.core</param-name>
+      <param-value>ocr</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>solr_servlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 </web-app>
