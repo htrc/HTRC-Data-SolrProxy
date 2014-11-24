@@ -22,7 +22,7 @@
     </init-param>
     <init-param>
       <param-name>solr.meta.core</param-name>
-      <param-value>collection1</param-value>
+      <param-value>collection1</param-value> 
     </init-param>
     <init-param>
       <param-name>solr.ocr.host</param-name>

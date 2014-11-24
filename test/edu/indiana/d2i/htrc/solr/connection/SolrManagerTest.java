@@ -41,11 +41,11 @@ public class SolrManagerTest {
 	SolrManager manager;
 	static QueryResponse response;
 	static SolrDocument doc;
-	static String id = "wu.89100062264";
+	static String id = "mdp.39015037738534";
 	
 	@Before
 	public void prepare(){
-		manager = new SolrManager("http://chinkapin.pti.indiana.edu", "9545","meta");
+		manager = new SolrManager("chinkapin.pti.indiana.edu", "9545","collection1");
 		
 		String queryStr = "id:"+id;
 		
